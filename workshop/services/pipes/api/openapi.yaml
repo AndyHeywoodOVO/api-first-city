@@ -1,0 +1,273 @@
+openapi: 3.1.0
+info:
+  title: Sample Service API
+  version: 1.0.0
+  description: Template service demonstrating API-first design
+servers:
+  - url: http://localhost:3001
+    description: Direct service access (development)
+  - url: http://localhost:8082/sample
+    description: API Gateway path
+paths:
+  /pipes:
+    get:
+      summary: List pipes
+      description: Retrieve a paginated list of pipes
+      operationId: listPipes
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+          description: Page number for pagination
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: Number of items per page
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: Filter pipes by name
+      responses:
+        '200':
+          description: List of pipes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipeList'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - oauth2: ['read:sample']
+    # post:
+    #   summary: Create a new resource
+    #   description: Create a new resource with the provided data
+    #   operationId: createResource
+    #   requestBody:
+    #     required: true
+    #     content:
+    #       application/json:
+    #         schema:
+    #           $ref: '#/components/schemas/PipeCreate'
+    #   responses:
+    #     '201':
+    #       description: Resource created
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: '#/components/schemas/Resource'
+    #     '400':
+    #       description: Invalid request data
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: '#/components/schemas/Error'
+    #     '401':
+    #       description: Unauthorized
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: '#/components/schemas/Error'
+    #   security:
+    #     - oauth2: ['write:sample']
+  /pipes/{id}:
+    get:
+      summary: Get a pipe by ID
+      description: Retrieve detailed information about a specific pipe
+      operationId: getPipe
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Pipe ID
+      responses:
+        '200':
+          description: Pipe details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pipe'
+        '404':
+          description: Pipe not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - oauth2: ['read:sample']
+
+  /health:
+    get:
+      summary: Health check
+      description: Check the health status of the service
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service health information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok, degraded, down]
+                  version:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+                required:
+                  - status
+                  - timestamp
+      security: []  # No authentication required for health check
+components:
+  schemas:
+    Pipe:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the pipe
+        capacity:
+          type: number
+          description: Capacity (in units)
+        pressure:
+          type: number
+
+        allowedPressure:
+          type: number
+
+        connectedOutlets:
+          type: array
+          items:
+            type: string
+          description: List of connected outlet IDs
+
+        connectedTreatmentPlan:
+          type: string
+          description: ID of the connected treatment plan
+
+        createdAt:
+          type: string
+          format: date-time
+          description: When the pipe was created
+
+        location:
+          type: string
+          description: Location of the pipe
+
+        updatedAt:
+          type: string
+          format: date-time
+          description: When the resource was last updated
+      required:
+        - id
+        - capacity
+        - pressure
+        - location
+        - allowedPressure
+        - connectedOutlets
+        - createdAt
+        - updatedAt
+
+    # PipeCreate:
+    #   type: object
+    #   properties:
+    #     name:
+    #       type: string
+    #       description: Name of the resource
+    #     description:
+    #       type: string
+    #       description: Detailed description of the resource
+    #     status:
+    #       $ref: '#/components/schemas/ResourceStatus'
+    #       description: Initial status of the resource
+    #       default: active
+    #     tags:
+    #       type: array
+    #       items:
+    #         type: string
+    #       description: Tags associated with the resource
+    #   required:
+    #     - name
+
+    PipeList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pipe'
+          description: List of resources
+        total:
+          type: number
+          description: Total number of resources matching the query
+        page:
+          type: number
+          description: Current page number
+        page_size:
+          type: number
+          description: Number of items per page
+      required:
+        - items
+        - total
+        - page
+        - page_size
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Error code
+            message:
+              type: string
+              description: Human-readable error message
+            details:
+              type: object
+              additionalProperties: true
+              description: Additional error details
+          required:
+            - code
+            - message
+      required:
+        - error
+
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: http://localhost:8081/oauth/token
+          scopes:
+            'read:sample': Read access to sample service resources
+            'write:sample': Write access to sample service resources
