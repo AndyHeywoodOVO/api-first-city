@@ -9,7 +9,7 @@ export type Pipe = {
    * Capacity (in units)
    */
   capacity: number;
-  pressure?: number;
+  pressure: number;
   allowedPressure: number;
   /**
    * List of connected outlet IDs

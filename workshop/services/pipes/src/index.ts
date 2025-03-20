@@ -11,6 +11,8 @@ import { initializeDatabase } from './config/database';
 import { setupSwaggerUI } from './middleware/swagger.middleware';
 import { createApp } from './app';
 
+import pipeController from './controllers/pipe-controller';
+
 // Create Express application
 const app = express();
 const logger = new Logger({ service: config.serviceName });
@@ -24,6 +26,8 @@ app.use(express.json());
 app.use((req: Request, res: Response, next: NextFunction) => {
   requestLogger(config.serviceName)(req, res, next);
 });
+
+app.use('/pipes', pipeController);
 
 // Set up OpenAPI spec path
 const apiSpecPath = path.join(__dirname, '../api/openapi.yaml');
