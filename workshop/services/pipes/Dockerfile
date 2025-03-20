@@ -3,9 +3,11 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Accept build argument for package path
-ARG PACKAGE_PATH=services/sample
+ARG PACKAGE_PATH=services/pipes
 
 # Copy the workspace and turbo files from the monorepo root
+COPY package.json ./
+RUN cat package.json
 COPY package.json yarn.lock turbo.json ./
 COPY common ./common
 
@@ -21,7 +23,7 @@ COPY ${PACKAGE_PATH}/src ./${PACKAGE_PATH}/src
 COPY ${PACKAGE_PATH}/api ./${PACKAGE_PATH}/api
 
 # Build using Turborepo
-RUN yarn turbo run build --filter=./services/sample...
+RUN yarn turbo run build --filter=./services/pipes...
 
 # Production stage
 FROM node:20-alpine
@@ -29,7 +31,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Accept build argument for package path again
-ARG PACKAGE_PATH=services/sample
+ARG PACKAGE_PATH=services/pipes
 
 # Copy package files from the monorepo
 COPY package.json yarn.lock ./
@@ -53,4 +55,4 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 CMD wget -q -O- http://localhost:3000/health || exit 1
 
 # Start the service
-CMD ["node", "services/sample/dist/index.js"] 
+CMD ["node", "services/pipes/dist/index.js"]
