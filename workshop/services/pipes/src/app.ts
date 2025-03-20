@@ -5,9 +5,9 @@ import cors from 'cors';
 import 'reflect-metadata'; // Required for TypeORM
 
 import config from './config/config';
-import { ResourceRepository } from './repositories/resource-repository';
-import { ResourceService } from './services/resource-service';
-import { ResourceController } from './controllers/resource-controller';
+import { PipeRepository } from './repositories/pipe-repository';
+import { PipeService } from './services/pipe-service';
+import { PipeController } from './controllers/pipe-controller';
 import { HealthController } from './controllers/health-controller';
 import { setupSwaggerUI } from './middleware/swagger.middleware';
 
@@ -27,20 +27,20 @@ export async function createApp(): Promise<Application> {
 
   // Create repositories
   logger.info('Creating repositories...');
-  const resourceRepository = new ResourceRepository();
+  const pipeRepo = new PipeRepository();
 
   // Create services
   logger.info('Creating services...');
-  const resourceService = new ResourceService(resourceRepository);
+  const pipeService = new PipeService(pipeRepo);
 
   // Create controllers
   logger.info('Creating controllers...');
-  const resourceController = new ResourceController(resourceService);
+  const pipeController = new PipeController(pipeService);
   const healthController = new HealthController(config.version);
 
   // Register routes
   logger.info('Registering routes...');
-  app.use('/resources', resourceController.getRouter());
+  app.use('/pipes', pipeController.getRouter());
   app.use('/health', healthController.getRouter());
 
   // Error handling middleware
@@ -52,7 +52,7 @@ export async function createApp(): Promise<Application> {
   if (config.environment === 'development') {
     try {
       logger.info('Development mode: Seeding initial data...');
-      await resourceService.seedData(20);
+      await pipeService.seedData(20);
       logger.info('Initial data seeded successfully');
     } catch (err) {
       logger.error('Error seeding data', err instanceof Error ? err : new Error(String(err)));
