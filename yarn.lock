@@ -683,9 +683,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@city-services/sample@workspace:workshop/services/sample":
+"@city-services/pipes@workspace:workshop/services/pipes":
   version: 0.0.0-use.local
-  resolution: "@city-services/sample@workspace:workshop/services/sample"
+  resolution: "@city-services/pipes@workspace:workshop/services/pipes"
   dependencies:
     "@city-services/common": "workspace:*"
     "@city-services/service-registry": "workspace:*"

@@ -1,5 +1,5 @@
 {
-  "name": "@city-services/sample",
+  "name": "@city-services/pipes",
   "version": "1.0.0",
   "description": "Sample API-first service implementation",
   "main": "dist/index.js",

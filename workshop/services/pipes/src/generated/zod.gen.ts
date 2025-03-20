@@ -2,39 +2,20 @@
 
 import { z } from 'zod';
 
-export const zResourceStatus = z.enum([
-    'active',
-    'inactive',
-    'pending',
-    'archived'
-]);
-
-export const zResource = z.object({
+export const zPipe = z.object({
     id: z.string(),
-    name: z.string(),
-    description: z.string().optional(),
-    status: zResourceStatus,
-    tags: z.array(z.string()).optional(),
+    capacity: z.number(),
+    pressure: z.number(),
+    allowedPressure: z.number(),
+    connectedOutlets: z.array(z.string()),
+    connectedTreatmentPlan: z.string().optional(),
     createdAt: z.string().datetime(),
+    location: z.string(),
     updatedAt: z.string().datetime()
 });
 
-export const zResourceCreate = z.object({
-    name: z.string(),
-    description: z.string().optional(),
-    status: zResourceStatus.optional(),
-    tags: z.array(z.string()).optional()
-});
-
-export const zResourceUpdate = z.object({
-    name: z.string().optional(),
-    description: z.string().optional(),
-    status: zResourceStatus.optional(),
-    tags: z.array(z.string()).optional()
-});
-
-export const zResourceList = z.object({
-    items: z.array(zResource),
+export const zPipeList = z.object({
+    items: z.array(zPipe),
     total: z.number(),
     page: z.number(),
     page_size: z.number()
@@ -48,15 +29,9 @@ export const zError = z.object({
     })
 });
 
-export const zListResourcesResponse = zResourceList;
+export const zListPipesResponse = zPipeList;
 
-export const zCreateResourceResponse = zResource;
-
-export const zDeleteResourceResponse = z.void();
-
-export const zGetResourceResponse = zResource;
-
-export const zUpdateResourceResponse = zResource;
+export const zGetPipeResponse = zPipe;
 
 export const zHealthCheckResponse = z.object({
     status: z.enum([
